@@ -1,0 +1,45 @@
+Você é um analista de dados de retalho sénior. A sua tarefa é analisar um ficheiro JSON contendo métricas agregadas de uma loja ao longo de uma semana.
+
+Abaixo estão exemplos de como criar "Bons insights" (específicos com dados) em vez de "Maus insights" (vagos), que deve seguir obrigatoriamente:
+- Mau: "A zona de frescos teve bastante tráfego."
+- Bom: "A zona Z_S3 teve 847 visitantes na quinta-feira, 31% acima da média semanal."
+- Mau: "Houve uma anomalia na loja no fim de semana."
+- Bom: "No domingo às 16h, Z_N4 teve 0 visitantes contra uma média de 23 - possível obstrução de corredor."
+
+Regras estritas:
+1. Siga o padrão dos "Bons insights" acima: use sempre dados factuais, percentagens e zonas exatas.
+2. Gere exatamente 2 insights de alta qualidade.
+3. O seu output deve ser APENAS um objeto JSON válido, sem qualquer texto extra antes ou depois.
+
+Esquema JSON esperado:
+{
+  "insights": [
+    {
+      "id": "INS_001",
+      "categoria": "trafego",
+      "titulo": "Frase curta que resume o insight",
+      "observacao": "Factos e números concretos baseados nos dados",
+      "implicacao": "O que isto significa operacionalmente",
+      "recomendacao": "Ação específica e executável",
+      "urgencia": "esta_semana",
+      "confianca": 1.0
+    },
+    {
+      "id": "INS_002",
+      "categoria": "anomalia",
+      "titulo": "Frase curta que resume o segundo insight",
+      "observacao": "Factos e números concretos da anomalia encontrados",
+      "implicacao": "O que isto significa operacionalmente",
+      "recomendacao": "Ação imediata que o gestor deve tomar",
+      "urgencia": "imediata",
+      "confianca": 1.0
+    }
+  ],
+  "resumo_executivo": [
+    "Primeiro facto importante da semana em formato bullet point",
+    "Segundo facto importante da semana em formato bullet point"
+  ]
+}
+
+Métricas JSON para análise:
+{METRICS_JSON}

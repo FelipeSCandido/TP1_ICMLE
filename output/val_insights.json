@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-19 01:09:01",
+    "model": "qwen2.5:3b",
+    "temperature": 0.0,
+    "strategies_run": [
+      "A",
+      "B"
+    ]
+  },
+  "zero_shot": {
+    "insights": [
+      {
+        "id": "INS_001",
+        "categoria": "trafego",
+        "titulo": "Visitas diárias variaram significativamente entre os dias mais movimentados e menos movimentados.",
+        "observacao": "A visita diária mais alta foi em 2025-03-15 (1896 visitantes), enquanto a menos alta foi em 2025-03-11 (1204 visitantes).",
+        "implicacao": "O fluxo de clientes é altamente variável ao longo da semana, com dias mais movimentados e outros menos.",
+        "recomendacao": "Implementar estratégias de marketing para aumentar a visibilidade durante os dias de maior tráfego.",
+        "urgencia": "esta_semana",
+        "confianca": 1.0
+      },
+      {
+        "id": "INS_002",
+        "categoria": "anomalia",
+        "titulo": "Zona Z_N4 registou uma alta frequência de visitantes em excesso durante o horário do meio-dia.",
+        "observacao": "Em 2025-03-16, às 12:00, a zona Z_N4 registou 96 visitantes esperados (média diária) contra 20 visitantes observados (z-score = 4.5).",
+        "implicacao": "Esta anomalia pode indicar uma tendência de alta frequência que não está sendo atendida adequadamente.",
+        "recomendacao": "Implementar medidas para reduzir a demanda durante o horário do meio-dia na zona Z_N4, como promoções ou limitações temporárias.",
+        "urgencia": "imediatamente",
+        "confianca": 1.0
+      }
+    ],
+    "resumo_executivo": [
+      "- A visita diária mais alta foi em 2025-03-15 (1896 visitantes), enquanto a menos alta foi em 2025-03-11 (1204 visitantes).",
+      "- Zona Z_N4 registou uma frequência de visitantes muito acima do esperado durante o horário do meio-dia, indicando um potencial problema de demanda."
+    ],
+    "evaluation": {
+      "specificity": 0.75,
+      "actionability": 0.6,
+      "overall": 0.68
+    }
+  },
+  "few_shot": {
+    "insights": [
+      {
+        "id": "INS_001",
+        "categoria": "trafego",
+        "titulo": "Z_S3 teve visitantes acima da média na quinta-feira (28% acima)",
+        "observacao": "A zona Z_S3 teve 4 visitantes na quinta-feira, 28% acima da média semanal de 2.0 visitantes.",
+        "implicacao": "O aumento significativo pode indicar uma promoção ou evento especial no dia.",
+        "recomendacao": "Verificar a programação para entender o motivo do aumento e preparar-se para possíveis aumentos futuros.",
+        "urgencia": "esta_semana",
+        "confianca": 1.0
+      },
+      {
+        "id": "INS_002",
+        "categoria": "anomalia",
+        "titulo": "Z_N4 teve visitantes abaixo da média no horário do fechamento (21h)",
+        "observacao": "A zona Z_N4 teve apenas 6 visitantes às 21h, contra uma média de 20.8 visitantes esperada.",
+        "implicacao": "O número muito baixo pode indicar um problema com a corredor ou falta de produtos.",
+        "recomendacao": "Verificar o corredor e verificar se há obstrução que possa estar afetando os clientes.",
+        "urgencia": "imediata",
+        "confianca": 1.0
+      }
+    ],
+    "resumo_executivo": [
+      "- Z_S3 teve visitantes acima da média na quinta-feira (28% acima)",
+      "- Z_N4 teve visitantes abaixo da média no horário do fechamento (21h)"
+    ],
+    "evaluation": {
+      "specificity": 1.0,
+      "actionability": 1.0,
+      "overall": 1.0
+    }
+  },
+  "comparison": {
+    "winner": "B (Few-shot)",
+    "zero_shot_scores": {
+      "specificity": 0.75,
+      "actionability": 0.6,
+      "overall": 0.68
+    },
+    "few_shot_scores": {
+      "specificity": 1.0,
+      "actionability": 1.0,
+      "overall": 1.0
+    },
+    "delta_specificity": 0.25,
+    "delta_actionability": 0.4
+  },
+  "insights": [
+    {
+      "id": "INS_001",
+      "categoria": "trafego",
+      "titulo": "Z_S3 teve visitantes acima da média na quinta-feira (28% acima)",
+      "observacao": "A zona Z_S3 teve 4 visitantes na quinta-feira, 28% acima da média semanal de 2.0 visitantes.",
+      "implicacao": "O aumento significativo pode indicar uma promoção ou evento especial no dia.",
+      "recomendacao": "Verificar a programação para entender o motivo do aumento e preparar-se para possíveis aumentos futuros.",
+      "urgencia": "esta_semana",
+      "confianca": 1.0
+    },
+    {
+      "id": "INS_002",
+      "categoria": "anomalia",
+      "titulo": "Z_N4 teve visitantes abaixo da média no horário do fechamento (21h)",
+      "observacao": "A zona Z_N4 teve apenas 6 visitantes às 21h, contra uma média de 20.8 visitantes esperada.",
+      "implicacao": "O número muito baixo pode indicar um problema com a corredor ou falta de produtos.",
+      "recomendacao": "Verificar o corredor e verificar se há obstrução que possa estar afetando os clientes.",
+      "urgencia": "imediata",
+      "confianca": 1.0
+    }
+  ],
+  "resumo_executivo": [
+    "- Z_S3 teve visitantes acima da média na quinta-feira (28% acima)",
+    "- Z_N4 teve visitantes abaixo da média no horário do fechamento (21h)"
+  ]
+}

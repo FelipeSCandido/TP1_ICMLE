@@ -1,0 +1,8 @@
+# Ignorar o dataset gigante para o GitHub nao bloquear o upload
+data/events.csv
+
+# Se usares ambiente virtual python, ignora também
+__pycache__/
+.venv/
+venv/
+.DS_Store

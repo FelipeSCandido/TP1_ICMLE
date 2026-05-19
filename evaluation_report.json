@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-05-19 01:08:34",
+  "input_data": "data/events.csv",
+  "steps": {
+    "stitcher": {
+      "success": true,
+      "elapsed_s": 20.0
+    },
+    "analytics": {
+      "success": true,
+      "elapsed_s": 3.3
+    },
+    "insights": {
+      "success": true,
+      "elapsed_s": 107.7
+    },
+    "report": {
+      "success": true,
+      "elapsed_s": 0.1
+    }
+  },
+  "stitching": {
+    "n_events_original": 250015,
+    "n_trajectories": 10712,
+    "consistency": 1.0,
+    "coverage": 1.0,
+    "completeness": 0.7619,
+    "temporal_plausibility": {
+      "n_gaps_measured": 74152,
+      "gap_mean_s": 28.6,
+      "gap_median_s": 14.0,
+      "gap_p95_s": 114.0,
+      "plausible": true
+    },
+    "pass": true
+  },
+  "anomaly_detection": {
+    "note": "Nenhuma anomalia conhecida fornecida. Forneça --known-anomalies para avaliação completa.",
+    "n_anomaly_insights": 1
+  },
+  "numerical_accuracy": {
+    "total_numbers_cited": 5,
+    "verified_in_metrics": 5,
+    "numerical_accuracy": 1.0,
+    "pass": true
+  },
+  "hallucination": {
+    "zone_mentions_total": 4,
+    "zone_mentions_valid": 4,
+    "hallucination_score": 1.0,
+    "pass": true
+  },
+  "summary": {
+    "all_steps_ok": true,
+    "stitching_pass": true,
+    "llm_quality_pass": true,
+    "overall_pass": true
+  }
+}

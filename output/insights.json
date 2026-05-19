@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-19 00:45:05",
+    "model": "qwen2.5:3b",
+    "temperature": 0.3,
+    "strategies_run": [
+      "A",
+      "B"
+    ]
+  },
+  "zero_shot": {
+    "insights": [
+      {
+        "id": "INS_001",
+        "categoria": "trafego",
+        "titulo": "Visitas diárias variaram significativamente em comparação com a média esperada.",
+        "observacao": "Z_C2 - 57 visitantes, Z_S4 - 39 visitantes, Z_N3 - 39 visitantes. Médias esperadas: Z_C2 - 25.7, Z_S4 - 1.8, Z_N3 - 25.0.",
+        "implicacao": "Existem dias onde a quantidade de visitantes é muito maior ou menor do que o normal, possivelmente causado por eventos especiais ou promoções.",
+        "recomendacao": "Realizar uma análise adicional para identificar os fatores subjacentes e preparar estratégias de marketing adequadas.",
+        "urgencia": "esta_semana",
+        "confianca": 1.0
+      },
+      {
+        "id": "INS_002",
+        "categoria": "anomalia",
+        "titulo": "Z_N4 registou visitantes acima do esperado em todas as horas.",
+        "observacao": "Z_N4 - 6 visitantes, Z_S4 - 15 visitantes. Média esperada: Z_N4 - 2.4, Z_S4 - 1.8.",
+        "implicacao": "A presença de um grande número de visitantes em determinadas horas pode indicar uma tendência de comportamento não normal ou uma promoção que está causando este aumento.",
+        "recomendacao": "Investigar as fases da promoção e considerar a implementação de medidas para controlar o fluxo de clientes durante estas horas.",
+        "urgencia": "imediatamente",
+        "confianca": 1.0
+      }
+    ],
+    "resumo_executivo": [
+      "- Visitas diárias variaram significativamente em comparação com a média esperada, especialmente para Z_C2 e Z_S4.",
+      "- A zona Z_N4 registou visitantes acima do esperado em todas as horas, indicando uma promoção ou evento que está causando este aumento."
+    ],
+    "evaluation": {
+      "specificity": 1.0,
+      "actionability": 0.6,
+      "overall": 0.8
+    }
+  },
+  "few_shot": {
+    "insights": [
+      {
+        "id": "INS_001",
+        "categoria": "trafego",
+        "titulo": "Festa de fim-de-semana reduziu tráfego",
+        "observacao": "A zona Z_N4 teve apenas 15 visitantes no domingo às 18h, contra uma média semanal esperada de 20.8.",
+        "implicacao": "O aumento do tráfego para a loja pode ter sido influenciado por eventos sociais na quinta-feira e sexta-feira.",
+        "recomendacao": "Implementar estratégias de marketing focadas em clientes que visitam a loja durante horários de baixo tráfego.",
+        "urgencia": "esta_semana",
+        "confianca": 1.0
+      },
+      {
+        "id": "INS_002",
+        "categoria": "anomalia",
+        "titulo": "Zona Z_C1 teve elevado tráfego em horário de picoletas",
+        "observacao": "A zona Z_C1 registou 41 visitantes às 21h, contra uma média semanal esperada de 19.2.",
+        "implicacao": "O aumento do tráfego pode ter sido influenciado por clientes que frequentam a loja durante horários de picoletas.",
+        "recomendacao": "Implementar estratégias de marketing focadas em clientes durante o horário de picoletas para aumentar o tráfego na zona Z_C1.",
+        "urgencia": "esta_semana",
+        "confianca": 1.0
+      }
+    ],
+    "resumo_executivo": [
+      "- A zona Z_N4 registou apenas 15 visitantes no domingo às 18h, contra uma média semanal esperada de 20.8.",
+      "- A zona Z_C1 registou elevado tráfego em horário de picoletas, com 41 visitantes às 21h."
+    ],
+    "evaluation": {
+      "specificity": 1.0,
+      "actionability": 0.6,
+      "overall": 0.8
+    }
+  },
+  "comparison": {
+    "winner": "B (Few-shot)",
+    "zero_shot_scores": {
+      "specificity": 1.0,
+      "actionability": 0.6,
+      "overall": 0.8
+    },
+    "few_shot_scores": {
+      "specificity": 1.0,
+      "actionability": 0.6,
+      "overall": 0.8
+    },
+    "delta_specificity": 0.0,
+    "delta_actionability": 0.0
+  },
+  "insights": [
+    {
+      "id": "INS_001",
+      "categoria": "trafego",
+      "titulo": "Festa de fim-de-semana reduziu tráfego",
+      "observacao": "A zona Z_N4 teve apenas 15 visitantes no domingo às 18h, contra uma média semanal esperada de 20.8.",
+      "implicacao": "O aumento do tráfego para a loja pode ter sido influenciado por eventos sociais na quinta-feira e sexta-feira.",
+      "recomendacao": "Implementar estratégias de marketing focadas em clientes que visitam a loja durante horários de baixo tráfego.",
+      "urgencia": "esta_semana",
+      "confianca": 1.0
+    },
+    {
+      "id": "INS_002",
+      "categoria": "anomalia",
+      "titulo": "Zona Z_C1 teve elevado tráfego em horário de picoletas",
+      "observacao": "A zona Z_C1 registou 41 visitantes às 21h, contra uma média semanal esperada de 19.2.",
+      "implicacao": "O aumento do tráfego pode ter sido influenciado por clientes que frequentam a loja durante horários de picoletas.",
+      "recomendacao": "Implementar estratégias de marketing focadas em clientes durante o horário de picoletas para aumentar o tráfego na zona Z_C1.",
+      "urgencia": "esta_semana",
+      "confianca": 1.0
+    }
+  ],
+  "resumo_executivo": [
+    "- A zona Z_N4 registou apenas 15 visitantes no domingo às 18h, contra uma média semanal esperada de 20.8.",
+    "- A zona Z_C1 registou elevado tráfego em horário de picoletas, com 41 visitantes às 21h."
+  ]
+}
