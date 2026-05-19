@@ -14,22 +14,37 @@ O projeto está estruturado como um pipeline sequencial e modular de processamen
 
 data/events.csv  (250k eventos em bruto)
 |
+
 stitcher.py     ◄─── Fase 1: Reconstrução O(1) de Trajetórias
+
 │
 
-utput/journeys.csv  (Trajetórias consolidadas)
+output/journeys.csv  (Trajetórias consolidadas)
+
 │
+
 analytics.py     ◄─── Fase 2a: Métricas Determinísticas & Anomalias
+
 │
+
 output/metrics.json  (Estatísticas e desvios)
+
 │
+
 insights.py   ◄─── Fase 2b: Prompting Engine (Qwen 2.5:3b via Ollama)
+
 │
+
 output/insights.json  (Análise qualitativa estruturada)
+
 │
+
 report.py      ◄─── Fase 2c: Compilação do Briefing Executivo
+
 │
+
 [ output/weekly_report.md ] (Relatório final limpo para o Gestor)
+
 
 ### Componentes do Repositório:
 * `src/stitcher.py`: Aborda o problema de correspondência de dados brutos (*data stitching*), unificando os registos fragmentados de sensores numa sequência cronológica contínua por cliente.
