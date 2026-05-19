@@ -8,7 +8,7 @@
 
 ---
 
-## 🏗️ 1. Arquitetura do Sistema e Engenharia de Software
+##  1. Arquitetura do Sistema e Engenharia de Software
 
 O projeto está estruturado como um pipeline sequencial e modular de processamento de dados e inteligência artificial. O fluxo foi desenhado para garantir a separação clara de responsabilidades, permitindo que cada componente funcione de forma independente e auditável.
 
@@ -56,7 +56,7 @@ report.py      ◄─── Fase 2c: Compilação do Briefing Executivo
 
 ---
 
-## ⚡ 2. Discussão Técnica e Opções de Implementação
+##  2. Discussão Técnica e Opções de Implementação
 
 ### Fase 1: Otimização Algorítmica e Resolução de Hiper-fragmentação
 O processamento inicial do volume de dados (250.000 eventos) apresentava barreiras severas de desempenho e precisão. A resolução destas condicionantes seguiu duas abordagens metodológicas estritas:
@@ -71,7 +71,7 @@ A operação de modelos de linguagem de menor escala em ambientes locais (como o
 
 ---
 
-## 📊 3. Análise Comparativa de Estratégias de Prompting
+##  3. Análise Comparativa de Estratégias de Prompting
 
 O sistema foi submetido ao crivo do avaliador automático `evaluate.py`, comparando o desempenho do modelo local perante duas arquiteturas de prompt distintas:
 
@@ -87,7 +87,7 @@ O modelo **Qwen 2.5:3b** beneficiou criticamente da **Estratégia B (Few-Shot)**
 
 ---
 
-## 🛠️ 4. Guia de Instalação e Execução
+##  4. Guia de Instalação e Execução
 
 ### Pré-requisitos
 Garante que tens o Python 3.11 ou superior instalado, bem como o ecossistema do Ollama ativo no teu computador.
