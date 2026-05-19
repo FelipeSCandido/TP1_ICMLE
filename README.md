@@ -12,38 +12,23 @@
 
 O projeto está estruturado como um pipeline sequencial e modular de processamento de dados e inteligência artificial. O fluxo foi desenhado para garantir a separação clara de responsabilidades, permitindo que cada componente funcione de forma independente e auditável.
 
-[ data/events.csv ] (250k eventos em bruto)
+data/events.csv  (250k eventos em bruto)
+|
+stitcher.py     ◄─── Fase 1: Reconstrução O(1) de Trajetórias
 │
-▼
-┌─────────────────┐
-│   stitcher.py   │  ◄─── Fase 1: Reconstrução O(1) de Trajetórias
-└────────┬────────┘
+
+utput/journeys.csv  (Trajetórias consolidadas)
 │
-▼
-[ output/journeys.csv ] (Trajetórias consolidadas)
+analytics.py     ◄─── Fase 2a: Métricas Determinísticas & Anomalias
 │
-▼
-┌─────────────────┐
-│  analytics.py   │  ◄─── Fase 2a: Métricas Determinísticas & Anomalias
-└────────┬────────┘
+output/metrics.json  (Estatísticas e desvios)
 │
-▼
-[ output/metrics.json ] (Estatísticas e desvios)
+insights.py   ◄─── Fase 2b: Prompting Engine (Qwen 2.5:3b via Ollama)
 │
-▼
-┌─────────────────┐
-│   insights.py   │  ◄─── Fase 2b: Prompting Engine (Qwen 2.5:3b via Ollama)
-└────────┬────────┘
+output/insights.json  (Análise qualitativa estruturada)
 │
-▼
-[ output/insights.json ] (Análise qualitativa estruturada)
+report.py      ◄─── Fase 2c: Compilação do Briefing Executivo
 │
-▼
-┌─────────────────┐
-│    report.py    │  ◄─── Fase 2c: Compilação do Briefing Executivo
-└────────┬────────┘
-│
-▼
 [ output/weekly_report.md ] (Relatório final limpo para o Gestor)
 
 ### Componentes do Repositório:
