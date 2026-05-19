@@ -1,9 +1,3 @@
-"""
-analytics.py -- Fase 2a: Pipeline Analitico
-==========================================
-Le journeys.csv e produz metrics.json. Texto limpo sem caracteres decorativos.
-"""
-
 import csv
 import json
 import argparse

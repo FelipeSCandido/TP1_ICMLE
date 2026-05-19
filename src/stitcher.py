@@ -4,10 +4,9 @@ import argparse
 from datetime import datetime
 from collections import defaultdict, deque
  
-# -- Parametros ----------------------------------------------------------------
-MAX_GAP_SECONDS = 900    # 15 minutos -- janela de inactividade maxima
-MIN_WALK_SEC    = 2      # minimo de walk entre zonas nao adjacentes
-SCORE_THRESHOLD = 0.10   # score minimo para associar a trajectoria existente
+MAX_GAP_SECONDS = 900    
+MIN_WALK_SEC    = 2      
+SCORE_THRESHOLD = 0.10   
  
 # Zonas de entrada (sempre iniciam nova trajectoria)
 ENTRY_ZONES   = {"Z_E1", "Z_E2"}
@@ -66,8 +65,6 @@ class Trajectory:
         self.gender_votes     = defaultdict(int)
         self.age_votes        = defaultdict(int)
         self.closed           = False
-        # Flag: visitou pelo menos uma zona interior (nao Z_E)?
-        # Necessario para distinguir "a sair" de "a entrar" em Z_E
         self.visited_interior = False
  
     def last_exit_time(self):
@@ -92,29 +89,24 @@ class Trajectory:
  
         gap = (ts - last_exit).total_seconds()
  
-        # -- Rejeicoes hard ----------------------------------------------------
         if gap < 0 or gap > MAX_GAP_SECONDS:
             return 0.0
  
         walk = min_walk(self.current_zone or zone, zone, graph)
-        if gap < walk * 0.4:          # margem de 40% para imprecisao de timestamps
+        if gap < walk * 0.4:          
             return 0.0
  
-        # -- Score temporal ----------------------------------------------------
         score_time = max(0.05, 1.0 - gap / MAX_GAP_SECONDS)
  
-        # -- Score de atributos (peso dominante) -------------------------------
         g_score    = GENDER_COMPAT.get((self.gender, gender), 0.5) if self.gender else 0.7
         a_score    = age_compat(self.age_range, age_range) if self.age_range else 0.7
         score_attr = 0.6 * g_score + 0.4 * a_score
  
-        # -- Bonus de adjacencia -----------------------------------------------
         last_zone  = self.current_zone or (self.zones[-1]["zone_id"] if self.zones else None)
         adj        = zone in graph.get(last_zone, {}) if last_zone else False
         same_zone  = (last_zone == zone)
         adj_bonus  = 0.20 if same_zone else (0.10 if adj else 0.0)
  
-        # Ponderacao: atributos dominam para evitar confundir pessoas diferentes
         return 0.40 * score_time + 0.45 * score_attr + adj_bonus
  
  
@@ -141,9 +133,9 @@ def stitch(events_path, zones_path, output_path):
             })
     print(f"  {len(events):,} eventos lidos", flush=True)
  
-    all_trajs    = {}                   # pid -> Trajectory
-    open_by_zone = defaultdict(list)    # zone -> [Trajectory]  (lookup rapido)
-    active_deque = deque()              # (last_exit_ts, pid) ordenado por tempo
+    all_trajs    = {}                   
+    open_by_zone = defaultdict(list)   
+    active_deque = deque()              
     pid_counter  = 1
     discarded    = 0
  
@@ -198,7 +190,6 @@ def stitch(events_path, zones_path, output_path):
                 elif zone in ENTRY_ZONES and t.visited_interior:
                     t.closed = True
                 else:
-                    # Manter aberta: regressar ao interior ou ainda na entrada
                     active_deque.append((ts, t.pid))
  
                 matched = True
@@ -215,10 +206,8 @@ def stitch(events_path, zones_path, output_path):
         best_traj  = None
  
         if not force_new:
-            # Pesquisa em todas as trajectorias activas (via deque, por recencia)
-            # Complexidade: O(T_activas) ~ O(30-50) na pratica
             seen = set()
-            for _, pid in reversed(active_deque):   # mais recentes primeiro
+            for _, pid in reversed(active_deque):  
                 if pid in seen:
                     continue
                 seen.add(pid)
@@ -230,8 +219,7 @@ def stitch(events_path, zones_path, output_path):
                     best_score = s
                     best_traj  = t
  
-            # Verificar tambem trajectorias abertas na zona actual e adjacentes
-            # (podem nao estar na deque se nunca tiveram exit registado)
+            
             candidate_zones = [zone] + list(graph.get(zone, {}).keys())
             for cz in candidate_zones:
                 for t in open_by_zone[cz]:
@@ -243,7 +231,6 @@ def stitch(events_path, zones_path, output_path):
                         best_traj  = t
  
         if best_traj is not None:
-            # Remover do indice da zona anterior
             cz = best_traj.current_zone
             if cz and best_traj in open_by_zone[cz]:
                 open_by_zone[cz].remove(best_traj)
@@ -260,12 +247,10 @@ def stitch(events_path, zones_path, output_path):
             best_traj.update_attrs(gender, age_range)
             open_by_zone[zone].append(best_traj)
  
-            # Marcar como interior se nao for zona de entrada
             if zone not in ENTRY_ZONES:
                 best_traj.visited_interior = True
  
         else:
-            # Nova trajectoria
             t = Trajectory(pid_counter)
             all_trajs[pid_counter] = t
             pid_counter += 1
@@ -283,13 +268,10 @@ def stitch(events_path, zones_path, output_path):
             if zone not in ENTRY_ZONES:
                 t.visited_interior = True
  
-            # Adicionar a deque apenas se nao for entry de porta
-            # (entries de porta nao precisam de estar na deque para match futuro --
-            #  sao sempre force_new se reaparecerem)
+           
             if zone not in ENTRY_ZONES:
                 active_deque.append((ts, t.pid))
  
-    # Fechar todas as remanescentes
     for t in all_trajs.values():
         t.closed = True
  
@@ -297,7 +279,6 @@ def stitch(events_path, zones_path, output_path):
     print(f"  Trajectorias reconstruidas: {n_trajs:,}", flush=True)
     print(f"  Eventos exit sem match:     {discarded:,}", flush=True)
  
-    # -- Escrever journeys.csv -------------------------------------------------
     header = ["person_id", "zone_id", "entry_time", "exit_time",
               "dwell_s", "gender", "age_range", "visit_date", "hour_of_day"]
  

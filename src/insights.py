@@ -1,10 +1,3 @@
-"""
-insights.py -- Fase 2b: LLM Insight Engine
-==========================================
-Recebe metrics.json e gera insights.json usando Ollama.
-Texto limpo sem caracteres decorativos para evitar falhas de codificacao.
-"""
-
 import json
 import argparse
 import re

@@ -1,16 +1,3 @@
-"""
-evaluate.py — Harness de Avaliação Automática
-=============================================
-Executa o pipeline de ponta a ponta sobre um dataset de validação
-e calcula métricas de qualidade.
-
-Uso:
-  python evaluate.py --data events_validation.csv --output evaluation_report.json
-
-O professor pode fornecer um CSV diferente com anomalias injectadas conhecidas.
-O harness NÃO deve estar optimizado para o dataset de treino.
-"""
-
 import csv
 import json
 import argparse
@@ -23,7 +10,6 @@ from datetime import datetime
 from collections import defaultdict
 
 
-# ── Configuração ──────────────────────────────────────────────────────────────
 STITCHER  = "src/stitcher.py"
 ANALYTICS = "src/analytics.py"
 INSIGHTS  = "src/insights.py"
@@ -35,7 +21,6 @@ EXIT_ZONES    = {"Z_E1", "Z_E2", "Z_CK"}
 CHECKOUT      = {"Z_C1", "Z_C2", "Z_C3"}
 
 
-# ── Pipeline runner ───────────────────────────────────────────────────────────
 
 def run_step(cmd, label):
     print(f"\n[evaluate] → {label}")
@@ -49,11 +34,9 @@ def run_step(cmd, label):
     return True, elapsed, ret.stdout
 
 
-# ── Métricas de Stitching ─────────────────────────────────────────────────────
 
 def eval_stitching(journeys_path: str, events_path: str) -> dict:
-    """Calcula as 4 métricas de qualidade definidas no enunciado."""
-    # Carregar journeys
+    
     journeys = []
     with open(journeys_path, newline="", encoding="utf-8") as f:
         journeys = list(csv.DictReader(f))
@@ -72,7 +55,6 @@ def eval_stitching(journeys_path: str, events_path: str) -> dict:
 
     n_persons = len(person_zones)
 
-    # 1. Consistência: % trajectórias sem sobreposição temporal
     inconsistent = 0
     for pid, rlist in person_zones.items():
         sorted_r = sorted(rlist, key=lambda r: r["entry_time"])
@@ -84,13 +66,11 @@ def eval_stitching(journeys_path: str, events_path: str) -> dict:
                 break
     consistency = 1.0 - inconsistent / max(n_persons, 1)
 
-    # 2. Cobertura: % de eventos entry do CSV original atribuídos a alguma trajectória
-    # Proxy: eventos entry no CSV vs linhas em journeys (entradas únicas)
+  
     n_entry_events = sum(1 for e in events if e["event_type"] == "entry")
-    n_assigned     = len(journeys)   # cada linha = uma visita a uma zona
+    n_assigned     = len(journeys)   
     coverage = min(1.0, n_assigned / max(n_entry_events, 1))
 
-    # 3. Completude: % trajectórias com início em Z_E e fim em Z_E ou Z_CK
     complete = 0
     for pid, rlist in person_zones.items():
         sorted_r = sorted(rlist, key=lambda r: r["entry_time"])
@@ -100,7 +80,6 @@ def eval_stitching(journeys_path: str, events_path: str) -> dict:
             complete += 1
     completeness = complete / max(n_persons, 1)
 
-    # 4. Plausibilidade temporal: distribuição de gaps entre zonas consecutivas
     gaps = []
     for pid, rlist in person_zones.items():
         sorted_r = sorted(rlist, key=lambda r: r["entry_time"])
@@ -135,14 +114,10 @@ def eval_stitching(journeys_path: str, events_path: str) -> dict:
     }
 
 
-# ── Deteção de Anomalias ──────────────────────────────────────────────────────
 
 def eval_anomaly_detection(insights_path: str,
                             known_anomalies: list = None) -> dict:
-    """
-    Verifica se as anomalias injectadas foram detectadas nos insights.
-    known_anomalies: lista de dicts com 'zone' e 'hour' (fornecida pelo professor).
-    """
+    
     with open(insights_path, encoding="utf-8") as f:
         insights_data = json.load(f)
 
@@ -175,13 +150,9 @@ def eval_anomaly_detection(insights_path: str,
     }
 
 
-# ── Precisão Numérica ─────────────────────────────────────────────────────────
 
 def eval_numerical_accuracy(insights_path: str, metrics_path: str) -> dict:
-    """
-    Verifica se os números citados nos insights existem em metrics.json.
-    Extrai números dos campos observacao e verifica se aparecem em metrics.json.
-    """
+    
     with open(insights_path, encoding="utf-8") as f:
         insights_data = json.load(f)
     with open(metrics_path, encoding="utf-8") as f:
@@ -196,7 +167,6 @@ def eval_numerical_accuracy(insights_path: str, metrics_path: str) -> dict:
         numbers = re.findall(r'\b\d+[\.,]?\d*\b', obs)
         for num in numbers:
             total_nums += 1
-            # Verificar se o número (ou próximo) aparece em metrics.json
             num_clean = num.replace(",", ".")
             if num_clean in metrics_str or num in metrics_str:
                 verified += 1
@@ -210,12 +180,9 @@ def eval_numerical_accuracy(insights_path: str, metrics_path: str) -> dict:
     }
 
 
-# ── Ausência de Alucinação ────────────────────────────────────────────────────
 
 def eval_hallucination(insights_path: str, metrics_path: str) -> dict:
-    """
-    Proxy: verifica se zonas mencionadas nos insights existem em metrics.json.
-    """
+    
     with open(insights_path, encoding="utf-8") as f:
         insights_data = json.load(f)
     with open(metrics_path, encoding="utf-8") as f:
@@ -245,12 +212,11 @@ def eval_hallucination(insights_path: str, metrics_path: str) -> dict:
     return {
         "zone_mentions_total":  total_mentions,
         "zone_mentions_valid":  valid_mentions,
-        "hallucination_score":  score,    # 1.0 = sem alucinação
+        "hallucination_score":  score,    
         "pass": score >= 0.85,
     }
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     ap = argparse.ArgumentParser()
@@ -270,13 +236,11 @@ def main():
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     report    = {"timestamp": timestamp, "input_data": args.data, "steps": {}}
 
-    # Ficheiros temporários de validação
     val_journeys = "output/val_journeys.csv"
     val_metrics  = "output/val_metrics.json"
     val_insights = "output/val_insights.json"
     val_report   = "output/val_report.md"
 
-    # ── 1. Stitching ──────────────────────────────────────────────────────────
     ok, elapsed, log = run_step(
         [STITCHER, "--input", args.data, "--zones", ZONES_FILE,
          "--output", val_journeys],
@@ -288,7 +252,6 @@ def main():
         _write(report, args.output)
         return
 
-    # ── 2. Analytics ─────────────────────────────────────────────────────────
     ok, elapsed, log = run_step(
         [ANALYTICS, "--input", val_journeys, "--output", val_metrics],
         "analytics.py"
@@ -299,7 +262,6 @@ def main():
         _write(report, args.output)
         return
 
-    # ── Métricas de Stitching ─────────────────────────────────────────────────
     print("\n[evaluate] A calcular métricas de stitching...")
     stitching_metrics = eval_stitching(val_journeys, args.data)
     report["stitching"] = stitching_metrics
@@ -313,7 +275,6 @@ def main():
         print(f"\n[evaluate] ✓ Relatório escrito em {args.output}")
         return
 
-    # ── 3. Insights ───────────────────────────────────────────────────────────
     ok, elapsed, log = run_step(
         [INSIGHTS, "--input", val_metrics, "--output", val_insights,
          "--strategy", "both", "--temperature", "0"],
@@ -325,14 +286,12 @@ def main():
         _write(report, args.output)
         return
 
-    # ── 4. Report ─────────────────────────────────────────────────────────────
     ok, elapsed, log = run_step(
         [REPORT, "--input", val_insights, "--output", val_report],
         "report.py"
     )
     report["steps"]["report"] = {"success": ok, "elapsed_s": elapsed}
 
-    # ── Métricas de LLM ───────────────────────────────────────────────────────
     print("\n[evaluate] A calcular métricas de qualidade dos insights...")
 
     report["anomaly_detection"] = eval_anomaly_detection(val_insights, known_anomalies)
@@ -344,7 +303,6 @@ def main():
     report["hallucination"] = eval_hallucination(val_insights, val_metrics)
     print(f"  Anti-alucinação:   {report['hallucination']['hallucination_score']:.1%}")
 
-    # ── Sumário final ─────────────────────────────────────────────────────────
     passes = [
         stitching_metrics.get("pass", False),
         report["numerical_accuracy"].get("pass", False),

@@ -1,9 +1,3 @@
-"""
-report.py -- Fase 2c: Relatorio Semanal Automatico
-==================================================
-Le insights.json e gera weekly_report.md briefing limpo em ASCII.
-"""
-
 import json
 import argparse
 from datetime import datetime
