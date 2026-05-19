@@ -13,6 +13,7 @@
 O projeto está estruturado como um pipeline sequencial e modular de processamento de dados e inteligência artificial. O fluxo foi desenhado para garantir a separação clara de responsabilidades, permitindo que cada componente funcione de forma independente e auditável.
 
 data/events.csv  (250k eventos em bruto)
+
 |
 
 stitcher.py     ◄─── Fase 1: Reconstrução O(1) de Trajetórias
