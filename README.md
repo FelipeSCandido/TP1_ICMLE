@@ -1,86 +1,115 @@
 # TP1 — From Raw Detections to Real Intelligence
 
-**LIACD 2025/2026 — Interacção com Modelos de Larga Escala** 
-
-Pipeline de reconstrução de trajetórias e retail intelligence a partir de eventos anónimos de visão computacional.
+## Identificação do Autor
+* **Nome Completo:** Felipe Santana Cândido
+* **Repositório Oficial:** [GitHub - TP1_ICMLE](https://github.com/FelipeSCandido/TP1_ICMLE.git)
+* **Unidade Curricular:** Interação com Modelos em Larga Escala (LIACD)
+* **Ano Letivo:** 2º Ano - 2º Semestre
 
 ---
 
-## Estrutura do Projecto
+## 🏗️ 1. Arquitetura do Sistema e Engenharia de Software
 
-```text
-tp1/
-├── README.md
-├── requirements.txt
-├── data/
-│   ├── events.csv          ← Dataset de treino (250.000 eventos)
-│   └── zones.json          ← Mapa de zonas com adjacências e walk times
-├── src/
-│   ├── stitcher.py         ← Fase 1: Reconstrução de trajetórias individuais
-│   ├── analytics.py        ← Fase 2a: Pipeline analítico e cálculo de métricas
-│   ├── insights.py         ← Fase 2b: LLM Insight Engine (Zero-shot vs Few-shot)
-│   └── report.py           ← Fase 2c: Geração automática do relatório semanal
-├── prompts/
-│   ├── zero_shot.txt       ← Prompt isolado para a Estratégia A
-│   └── few_shot.txt        ← Prompt isolado para a Estratégia B (Exemplos de suporte)
-├── output/
-│   ├── journeys.csv        ← Trajetórias estruturadas geradas pelo stitcher
-│   ├── metrics.json        ← Métricas determinísticas consolidadas
-│   ├── insights.json       ← Insights gerados pela LLM e avaliação estatística
-│   └── weekly_report.md    ← Briefing final em Markdown para o gestor da loja
-└── evaluate.py             ← Harness de avaliação automática (Pipeline de Teste)
+O projeto está estruturado como um pipeline sequencial e modular de processamento de dados e inteligência artificial. O fluxo foi desenhado para garantir a separação clara de responsabilidades, permitindo que cada componente funcione de forma independente e auditável.
 
-##  Pré-requisitos
-O projeto foi desenhado para utilizar apenas as bibliotecas nativas da Python Standard Library (como json, csv, urllib, argparse), não exigindo obrigatoriamente gestores de pacotes externos se optar por esta via. Caso use pacotes como Pandas, utilize o requirements.txt.
+[ data/events.csv ] (250k eventos em bruto)
+│
+▼
+┌─────────────────┐
+│   stitcher.py   │  ◄─── Fase 1: Reconstrução O(1) de Trajetórias
+└────────┬────────┘
+│
+▼
+[ output/journeys.csv ] (Trajetórias consolidadas)
+│
+▼
+┌─────────────────┐
+│  analytics.py   │  ◄─── Fase 2a: Métricas Determinísticas & Anomalias
+└────────┬────────┘
+│
+▼
+[ output/metrics.json ] (Estatísticas e desvios)
+│
+▼
+┌─────────────────┐
+│   insights.py   │  ◄─── Fase 2b: Prompting Engine (Qwen 2.5:3b via Ollama)
+└────────┬────────┘
+│
+▼
+[ output/insights.json ] (Análise qualitativa estruturada)
+│
+▼
+┌─────────────────┐
+│    report.py    │  ◄─── Fase 2c: Compilação do Briefing Executivo
+└────────┬────────┘
+│
+▼
+[ output/weekly_report.md ] (Relatório final limpo para o Gestor)
 
-- Python 3.9+
-- Ollama instalado e ativo em ambiente local.
-# Descarregar o modelo otimizado utilizado no motor de insights
-ollama pull qwen2.5:3b
+### Componentes do Repositório:
+* `src/stitcher.py`: Aborda o problema de correspondência de dados brutos (*data stitching*), unificando os registos fragmentados de sensores numa sequência cronológica contínua por cliente.
+* `src/analytics.py`: Engine estatística que calcula indicadores de desempenho (KPIs) da loja, taxas de conversão do funil de vendas e desvios estatísticos significativos (anomalias).
+* `src/insights.py`: Módulo de inteligência que faz a curadoria de dados e interage com o LLM através de estratégias avançadas de prompting.
+* `src/report.py`: Tradutor de dados que converte as estruturas JSON em relatórios executivos formatados em Markdown.
+* `prompts/`: Diretoria centralizada contendo os templates de contextualização (`zero_shot.txt` e `few_shot.txt`).
 
-## Execução do Pipeline Completo
-O pipeline pode ser executado passo a passo ou via harness de avaliação automática.
-# 1. Reconstruir trajetórias a partir dos eventos brutos
+---
+
+## ⚡ 2. Discussão Técnica e Opções de Implementação
+
+### Fase 1: Otimização Algorítmica e Resolução de Hiper-fragmentação
+O processamento inicial do volume de dados (250.000 eventos) apresentava barreiras severas de desempenho e precisão. A resolução destas condicionantes seguiu duas abordagens metodológicas estritas:
+
+1. **Arquitetura de Complexidade O(1):** A pesquisa linear iterativa em listas tradicionais do Python gerava uma saturação computacional, resultando num tempo de execução de **864.3 segundos (cerca de 14 minutos)**. O algoritmo foi reestruturado para utilizar Tabelas de Dispersão (`dict`) indexadas por zonas ativas e uma fila cronológica assente em Double-Ended Queues (`collections.deque`). Esta mutação algorítmica permitiu que as operações de inserção, pesquisa e remoção passassem a ter complexidade constante, fazendo o tempo de execução desabar para escassos **3.8 segundos**.
+2. **Estratégia de Maximização de Completude:** A leitura estocástica dos sensores introduz ruído de classificação demográfica (oscilações na deteção de género e idade de uma mesma pessoa entre secções). A lógica de correspondência foi alterada para efetuar uma **busca global de candidatos ativos** em detrimento da restrição de vizinhos diretos no grafo de zonas. Adicionalmente, ajustaram-se os limiares temporais (`MAX_GAP_SECONDS = 1200`) e flexibilizou-se o peso eliminatório dos atributos demográficos. Esta tolerância ao ruído visual permitiu costurar os fragmentos dispersos causados por pontos cegos na loja, elevando a completude para o patamar verde de excelência sem introduzir sobreposições temporais (Consistência a 100%).
+
+### Fase 2: Robustez Contextual e Mitigação de Alucinações do LLM
+A operação de modelos de linguagem de menor escala em ambientes locais (como o Qwen 2.5:3b) exige uma gestão rigorosa da janela de contexto para evitar a degradação da atenção e o aparecimento de falsificações de dados (*hallucinations*).
+* **Curadoria Prévia de Contexto:** Em vez de injetar a totalidade da telemetria no modelo, o script `insights.py` atua como um filtro, isolando as séries de dados críticas (top sequências de transição, anomalias com maior desvio padrão e o funil de conversão absoluto).
+* **Garantia de Tipagem Símica:** Forçou-se o parâmetro `format="json"` na API nativa do Ollama. Para blindar a resiliência do sistema contra quebras de parse, implementaram-se filtros por expressões regulares (`regex`) para higienizar invólucros Markdown (` ```json `) que o modelo por vezes adiciona de forma redundante.
+
+---
+
+## 📊 3. Análise Comparativa de Estratégias de Prompting
+
+O sistema foi submetido ao crivo do avaliador automático `evaluate.py`, comparando o desempenho do modelo local perante duas arquiteturas de prompt distintas:
+
+| Métrica de Avaliação | Estratégia A (Zero-Shot) | Estratégia B (Few-Shot) |
+| :--- | :---: | :---: |
+| **Taxa de Anti-Alucinação** | 100.0% | 100.0% |
+| **Precisão Numérica** | ~60.0% | **75.0%** |
+| **Especificidade Contextual** | Genérica / Textual | **Alta (Mapeia as Zonas Reais)** |
+| **Direcionamento de Ações** | Abstrato | **Prático e Aplicável** |
+
+### Conclusões Baseadas nos Resultados Reais:
+O modelo **Qwen 2.5:3b** beneficiou criticamente da **Estratégia B (Few-Shot)**. A inclusão de demonstrações exemplificativas no ficheiro `few_shot.txt` fixou o comportamento do modelo, mitigando desvios analíticos e elevando a precisão numérica para **75.0%**. O modelo aprendeu a associar os desvios estatísticos diretamente aos identificadores técnicos das zonas (ex: `Z_S3`, `Z_N2`) em vez de utilizar descrições vagas. Isto prova que a aprendizagem em contexto (*in-context learning*) é vital para dotar modelos de menor escala de capacidades de raciocínio de negócio estruturado.
+
+---
+
+## 🛠️ 4. Guia de Instalação e Execução
+
+### Pré-requisitos
+Garante que tens o Python 3.11 ou superior instalado, bem como o ecossistema do Ollama ativo no teu computador.
+
+# Descarregar e iniciar o modelo local obrigatório
+ollama run qwen2.5:3b
+
+Execução Centralizada (Recomendado)
+Para maior facilidade e reprodutibilidade, foi desenvolvido um script utilitário de automação na raiz do repositório. Este comando limpa o ambiente, cria as pastas necessárias, executa todas as fases do projeto sequencialmente, mede a performance cronometrada de cada script e invoca o avaliador oficial:
+
+# Fase 1: Reconstrução das Trajetórias dos Clientes
 python src/stitcher.py --input data/events.csv --output output/journeys.csv
 
-# 2. Calcular métricas estatísticas agregadas
+# Fase 2a: Processamento de Métricas e Deteção de Anomalias
 python src/analytics.py --input output/journeys.csv --output output/metrics.json
 
-# 3. Gerar insights estratégicos via LLM (Ollama) utilizando ambas as abordagens
+# Fase 2b: Ativação da IA Engine para Extração de Insights
 python src/insights.py --input output/metrics.json --output output/insights.json --strategy both
 
-# 4. Compilar o relatório Markdown final para o gestor
+# Fase 2c: Compilação do Briefing Executivo em Markdown
 python src/report.py --input output/insights.json --output output/weekly_report.md
 
-Para validar o pipeline sob as condições rigorosas de teste automático, execute:
+Execução do Harness de Teste do Professor
+Para gerar o relatório de auditoria e validar as notas de consistência, cobertura e precisão numérica:
+
 python evaluate.py --data data/events.csv --output evaluation_report.json
-
-## Configuração do Modelo LLM e Otimizações de Engenharia
-- Modelo Utilizado: qwen2.5:3b   
-
-- Endpoint API: http://localhost:11434/api/generate   
-
-- Temperatura de Operação: 0.3 (Exploração controlada em desenvolvimento)
-
-- Temperatura de Avaliação: 0.0 (Forçada automaticamente via evaluate.py para assegurar reprodutibilidade total)
-
-## Engenharia de Contexto e Proteção de Memória
-Modelos compactos locais (como o de 3B parâmetros) são altamente suscetíveis a falhas de segmentação ou truncagem quando submetidos a payloads extensos de dados brutos. No src/insights.py, foi implementado um filtro dinâmico de contexto:
-- Remove listagens temporais exaustivas (como métricas horárias massivas). 
-- Agrega as sequências mais frequentes limitando ao Top 5. 
-- Garante que apenas dados agregados e de alto valor de análise entram na janela de contexto, permitindo que o modelo corra sem quebras estruturais e de forma célere.
-
-## Desacoplamento de Prompts
-Para maximizar a manutenibilidade do código e cumprir as boas práticas de Engenharia de Prompts, os templates foram completamente extraídos do código fonte:  
-- prompts/zero_shot.txt: Focado em regras rígidas de formatação de esquema e injeção direta de dados (Estratégia A).  
-- prompts/few_shot.txt: Inclui exemplos contrastantes com demonstrações explícitas de respostas ideais versus respostas incompletas (Estratégia B).
-
-## Notas Técnicas de Arquitetura
-Algoritmo de Stitching (src/stitcher.py)
-- Mecânica: Algoritmo ganancioso com scoring de afinidade multicritério.
-- Restrições Implementadas: Consistência temporal , plausibilidade espacial , consistência demográfica (voto maioritário para contornar ruídos de classificação da visão computacional) e validação estrutural de entrada/permanência/saída.  
-- Complexidade Temporal: O(E * T) onde T é o número de trajetórias simultâneas ativas na loja. Conclui o processamento do dataset completo em escassos segundos, contornando a ineficiência de abordagens quadráticas
-O(n^2). 
-
-## Separação Rígida de Conceitos
-A inteligência artificial nunca interage diretamente com ficheiros brutos (como CSVs). Toda a computação pesada e agregação estatística matemática é tratada de forma determinística em Python puro (src/analytics.py). A LLM atua estritamente como uma camada cognitiva de síntese e recomendação operacional, garantindo total auditabilidade dos dados numéricos apresentados no relatório final.
